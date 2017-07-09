@@ -2,13 +2,14 @@
 
 '''Main module.'''
 
+import collections
 import time
 
 from bokeh import io as bi
 from bokeh import models as bm
 from bokeh import palettes
 from bokeh import plotting as bp
-from IPython import display
+from IPython import display as ipdisplay
 import ipywidgets as widgets
 import numpy as np
 import pandas as pd
@@ -27,10 +28,145 @@ class Timer(object):
         return self._end - self._begin
 
     @classmethod
-    def time(cls, fn):
+    def time(cls, fn, *args, **kwargs):
         with cls() as timer:
-            fn()
+            fn(*args, **kwargs)
         return timer.elapsed_seconds()
+
+
+class Display(object):
+    def __init__(self, names, initial_size, width=900, height=480):
+        # Call this once to raise an error early if necessary:
+        self._colors(len(names))
+
+        self._start = time.perf_counter()
+        self._initial_size = initial_size
+        self._sources = collections.OrderedDict([
+            (name, {
+                'hist': bm.ColumnDataSource(
+                    data={'top': [], 'left': [], 'right': []}),
+                'pdf': bm.ColumnDataSource(
+                    data={'x': [], 'y': []}),
+                'stddev': bm.ColumnDataSource(
+                    data={'base': [], 'lower': [], 'upper': []}),
+                'median': bm.ColumnDataSource(
+                    data={'x': [], 'y': []})
+            })
+            for name in names
+        ])
+        self._width = width
+        self._height = height
+        self._plot = None
+        self._elapsed_rendering_seconds = 0.0
+        self._describe_widget = ipdisplay.HTML('')
+
+    def elapsed_rendering_ratio(self):
+        elapsed = time.perf_counter() - self._start
+        return self._elapsed_rendering_seconds / elapsed
+
+    @staticmethod
+    def _colors(num_colors):
+        if num_colors < 3:
+            return iter(palettes.Set1[3][:num_colors])
+        else:
+            try:
+                return iter(palettes.Set1[num_colors])
+            except KeyError:
+                raise Exception(
+                    'Too many functions to benchmark, we only have colors to '
+                    'support {}'.format(max(palettes.Set1.keys())))
+
+    def initialize_plot(self, title):
+        with Timer() as timer:
+            colors = self._colors(len(self._sources))
+            plot = bp.figure(
+                title=title, plot_width=self._width, plot_height=self._height)
+            plot.xaxis.axis_label = 'millis'
+            plot.yaxis.visible = False
+            for name, sources in self._sources.items():
+                color = next(colors)
+                plot.quad(
+                    top='top', bottom=0, left='left', right='right',
+                    source=sources['hist'],
+                    alpha=0.3, fill_color=color, line_color=color)
+                plot.line(
+                    'x', 'y', source=sources['pdf'], legend=name,
+                    alpha=0.5, line_color=color, line_width=4)
+                stddev = bm.Whisker(
+                    base='base', lower='lower', upper='upper',
+                    source=sources['stddev'], dimension='width',
+                    line_alpha=0.7, line_color=color, line_width=2)
+                for head in (stddev.lower_head, stddev.upper_head):
+                    head.line_color = color
+                    head.line_width = 2
+                    head.line_alpha = 0.7
+                plot.add_layout(stddev)
+                median = bm.Whisker(
+                    base='y', lower='x', upper='x',
+                    source=sources['median'], dimension='width',
+                    line_alpha=0.7, line_color=color, line_width=2)
+                for head in (median.lower_head, median.upper_head):
+                    head.line_color = color
+                    head.line_width = 2
+                    head.line_alpha = 0.7
+                plot.add_layout(median)
+
+        self._elapsed_rendering_seconds -= timer.elapsed_seconds()
+        return plot
+
+    def update(self, samples):
+        with Timer() as timer:
+            for name, sources in self._sources.items():
+                array = samples[name].values
+                hist, edges = np.histogram(array, density=True, bins='auto')
+                x, y = sns.distributions._statsmodels_univariate_kde(
+                    array, 'gau', 'scott', 200, 3, (-np.inf, np.inf),
+                    cumulative=False)
+                whisker_height = np.max(y) / 2
+                lower, median, upper = np.percentile(array, [25., 50., 75.])
+
+                sources['hist'].data = {
+                    'top': hist,
+                    'left': edges[:-1],
+                    'right': edges[1:]
+                }
+                sources['pdf'].data = {
+                    'x': x,
+                    'y': y
+                }
+                sources['stddev'].data = {
+                    'base': [whisker_height],
+                    'lower': [lower],
+                    'upper': [upper]
+                }
+                sources['median'].data = {
+                    'x': [median],
+                    'y': [whisker_height]
+                }
+
+            self._describe_widget.data = samples.describe().to_html()
+            total_bench_time = samples[self._initial_size:].sum().sum() / 1000.
+            elapsed = time.perf_counter() - self._start
+            num_samples = len(samples.index)
+            title = (
+                '{} samples, {:.2f} sec elapsed, {:.2f} samples/sec, '
+                '{:.2f}% efficiency').format(
+                    num_samples,
+                    elapsed,
+                    (num_samples - self._initial_size) / elapsed,
+                    100. * total_bench_time / elapsed)
+
+            if self._plot is None:
+                self._plot = self.initialize_plot(title)
+                ipdisplay.display(
+                    self._describe_widget, display_id='describe')
+                bi.show(self._plot, notebook_handle=True)
+            else:
+                self._plot.title.text = title
+                ipdisplay.update_display(
+                    self._describe_widget, display_id='describe')
+                bi.push_notebook()
+        self._elapsed_rendering_seconds += timer.elapsed_seconds()
 
 
 def bench(*fns, samples=None, efficiency=.9):
@@ -39,92 +175,20 @@ def bench(*fns, samples=None, efficiency=.9):
     TODO: more
     '''
     if samples is None:
-        data = []
+        sample_records = []
     else:
-        data = [tuple(r) for r in samples.to_records(index=False)]
-    start = time.perf_counter()
-    initial_size = len(data)
-    times = None
-    if len(fns) < 3:
-        colors = palettes.Set1[3][:len(fns)]
-    else:
-        colors = palettes.Set1[len(fns)]
-    hist_datas = [bm.ColumnDataSource(data={'top': [], 'left': [], 'right': []}) for _ in fns]
-    pdfs = [bm.ColumnDataSource(data={'x': [], 'y': []}) for _ in fns]
-    whiskers = [bm.ColumnDataSource(data={'25': [], 'base': [], '75': []}) for _ in fns]
-    medians = [bm.ColumnDataSource(data={'x': [], 'y': []}) for _ in fns]
-    title = bm.Title(text='Distribution')
-    p = bp.figure(title=title, plot_width=900, plot_height=480)
-    p.xaxis.axis_label = 'millis'
-    p.yaxis.visible = False
-    first = True
-    elapsed_rendering = 0.0
-    describe_widget = None
+        sample_records = [tuple(r) for r in samples.to_records(index=False)]
+    names = [fn.__name__ for fn in fns]
+    disp = Display(names, len(sample_records))
     try:
         while True:
-            data.append(tuple(Timer.time(fn) * 1000. for fn in fns))
-            if (len(data) < 10
-                    or (elapsed_rendering / (time.perf_counter() - start)) > (1. - efficiency)):
-                continue
-            with Timer() as timer:
-                times = pd.DataFrame.from_records(iter(data), columns=[fn.__name__ for fn in fns])
-                total_bench_time = times[initial_size:].sum().sum() / 1000.
-                elapsed = time.perf_counter() - start
-                title.text = (
-                    'Distribution ('
-                    '{} samples, '
-                    '{:.2f} sec elapsed, '
-                    '{:.2f} samples/sec, '
-                    '{:.2f}% efficiency)').format(
-                    len(times.index),
-                    elapsed,
-                    (len(times.index) - initial_size) / elapsed,
-                    100. * total_bench_time / elapsed)
-                for fn, hist_data, pdf, whisker, median, color in zip(fns, hist_datas, pdfs, whiskers, medians, colors):
-                    time_array = times[fn.__name__].values
-                    hist, edges = np.histogram(time_array, density=True, bins='auto')
-                    hist_data.data = {'top': hist, 'left': edges[:-1], 'right': edges[1:]}
-                    x, y = sns.distributions._statsmodels_univariate_kde(
-                        time_array, 'gau', 'scott', 200, 3, (-np.inf, np.inf), cumulative=False)
-                    pdf.data = {'x': x, 'y': y}
-                    mid_height = np.max(y) / 2.
-                    whisker.data = {'25': [np.percentile(time_array, 25.)],
-                                    'base': [mid_height],
-                                    '75': [np.percentile(time_array, 75.)]}
-                    median.data = {'x': [np.percentile(time_array, 50.)],
-                                   'y': [mid_height]}
+            sample_records.append(tuple(Timer.time(fn) * 1000. for fn in fns))
 
-                if first:
-                    for fn, hist_data, pdf, whisker, median, color in zip(fns, hist_datas, pdfs, whiskers, medians, colors):
-                        p.quad(top='top', bottom=0, left='left', right='right', source=hist_data, alpha=0.3,
-                               fill_color=color, line_color=color)
-                        p.line('x', 'y', source=pdf, legend=fn.__name__, line_color=color, line_width=4, alpha=0.5)
-                        wsk = bm.Whisker(source=whisker, base='base', lower='25', upper='75',
-                                         dimension='width', line_color=color, line_width=2, line_alpha=0.7)
-                        wsk.lower_head.line_color = color
-                        wsk.lower_head.line_width = 2
-                        wsk.lower_head.line_alpha = 0.7
-                        wsk.upper_head.line_color = color
-                        wsk.upper_head.line_width = 2
-                        wsk.upper_head.line_alpha = 0.7
-                        p.add_layout(wsk)
-                        wsk = bm.Whisker(source=median, base='y', lower='x', upper='x',
-                                         dimension='width', line_color=color, line_width=2, line_alpha=0.7)
-                        wsk.lower_head.line_color = color
-                        wsk.lower_head.line_width = 2
-                        wsk.lower_head.line_alpha = 0.7
-                        wsk.upper_head.line_color = color
-                        wsk.upper_head.line_width = 2
-                        wsk.upper_head.line_alpha = 0.7
-                        p.add_layout(wsk)
-                    handle = bi.show(p, notebook_handle=True)
-                    first = False
-                    describe_widget = display.HTML(times.describe().to_html())
-                    display.display(describe_widget, display_id='describe')
-                else:
-                    bi.push_notebook()
-                    describe_widget.data = times.describe().to_html()
-                    display.update_display(describe_widget, display_id='describe')
-            elapsed_rendering += timer.elapsed_seconds()
+            if (len(sample_records) > 10
+                    and disp.elapsed_rendering_ratio() < (1. - efficiency)):
+                samples = pd.DataFrame.from_records(
+                    iter(sample_records), columns=names)
+                disp.update(samples)
     except KeyboardInterrupt:
-        return times
+        return pd.DataFrame.from_records(
+            iter(sample_records), columns=names)
