@@ -24,6 +24,11 @@ Interactive performance benchmarking in Jupyter
 * Free software: BSD license
 * Documentation: https://perfume.readthedocs.io.
 
+Demo
+----
+
+.. image:: https://raw.githubusercontent.com/leifwalsh/perfume/master/docs/perfume.gif
+
 
 Features
 --------
