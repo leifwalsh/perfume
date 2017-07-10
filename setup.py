@@ -13,7 +13,14 @@ with open('HISTORY.rst') as history_file:
 
 requirements = [
     'Click>=6.0',
-    # TODO: put package requirements here
+    'bokeh>=0.12',
+    'ipython>=5.0',
+    'ipywidgets>=5.0',
+    'notebook>=5.0',
+    'numpy>=1.12',
+    'pandas>=0.19',
+    'seaborn>=0.7',
+    'statsmodels>=0.8',
 ]
 
 setup_requirements = [
