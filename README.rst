@@ -29,11 +29,29 @@ Demo
 
 .. image:: https://raw.githubusercontent.com/leifwalsh/perfume/master/docs/perfume.gif
 
+Overview
+--------
+
+`perfume` is a performance benchmarking tool that provides quick
+feedback on the systems under test.
+
+The primary goals are:
+
+* Prioritize analysis of *distributions* of latency, not averages.
+* Support both immediate feedback and robust benchmarking with many
+  samples, through a UI that updates as we collect more information.
+* Provide raw data back to the user, for flexible custom analysis.
+* Provide helpful post-processing analysis and charting tools.
 
 Features
 --------
 
-* TODO
+* Live-updating histogram chart and descriptive statistics during a
+  benchmark run.
+* Jupyter notebook integration.
+* Tunable benchmarking overhead.
+* Comparative analysis of multiple functions under test.
+* TODO: Powerful post-processing analysis tools.
 
 Credits
 ---------
