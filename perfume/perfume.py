@@ -9,7 +9,6 @@ from bokeh import io as bi
 from bokeh import models as bm
 from bokeh import plotting as bp
 from IPython import display as ipdisplay
-import ipywidgets as widgets
 import numpy as np
 import pandas as pd
 import seaborn as sns
