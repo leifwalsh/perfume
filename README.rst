@@ -27,6 +27,10 @@ Interactive performance benchmarking in Jupyter
 Demo
 ----
 
+You can check out `an example notebook
+<http://nbviewer.jupyter.org/github/leifwalsh/perfume/blob/master/examples/perfume.ipynb>`__
+using perfume.
+
 .. image:: https://raw.githubusercontent.com/leifwalsh/perfume/master/docs/perfume.gif
 
 .. image:: https://raw.githubusercontent.com/leifwalsh/perfume/master/docs/cumulative_quantiles.png
