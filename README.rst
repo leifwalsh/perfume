@@ -29,6 +29,8 @@ Demo
 
 .. image:: https://raw.githubusercontent.com/leifwalsh/perfume/master/docs/perfume.gif
 
+.. image:: https://raw.githubusercontent.com/leifwalsh/perfume/master/docs/cumulative_quantiles.png
+
 Overview
 --------
 
@@ -51,7 +53,7 @@ Features
 * Jupyter notebook integration.
 * Tunable benchmarking overhead.
 * Comparative analysis of multiple functions under test.
-* TODO: Powerful post-processing analysis tools.
+* Powerful post-processing analysis tools.
 
 Credits
 ---------
