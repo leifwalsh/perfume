@@ -7,13 +7,15 @@ import time
 
 from bokeh import io as bi
 from bokeh import models as bm
-from bokeh import palettes
 from bokeh import plotting as bp
 from IPython import display as ipdisplay
 import ipywidgets as widgets
 import numpy as np
 import pandas as pd
 import seaborn as sns
+
+from perfume import analyze
+from perfume import colors
 
 
 class Timer(object):
@@ -24,8 +26,16 @@ class Timer(object):
     def __exit__(self, *exc_info):
         self._end = time.perf_counter()
 
+    @property
+    def begin(self):
+        return self._begin
+
+    @property
+    def end(self):
+        return self._end
+
     def elapsed_seconds(self):
-        return self._end - self._begin
+        return self.end - self.begin
 
     @classmethod
     def time(cls, fn, *args, **kwargs):
@@ -37,7 +47,7 @@ class Timer(object):
 class Display(object):
     def __init__(self, names, initial_size, width=900, height=480):
         # Call this once to raise an error early if necessary:
-        self._colors(len(names))
+        colors.colors(len(names))
 
         self._start = time.perf_counter()
         self._initial_size = initial_size
@@ -64,27 +74,15 @@ class Display(object):
         elapsed = time.perf_counter() - self._start
         return self._elapsed_rendering_seconds / elapsed
 
-    @staticmethod
-    def _colors(num_colors):
-        if num_colors < 3:
-            return iter(palettes.Set1[3][:num_colors])
-        else:
-            try:
-                return iter(palettes.Set1[num_colors])
-            except KeyError:
-                raise Exception(
-                    'Too many functions to benchmark, we only have colors to '
-                    'support {}'.format(max(palettes.Set1.keys())))
-
     def initialize_plot(self, title):
         with Timer() as timer:
-            colors = self._colors(len(self._sources))
+            _colors = colors.colors(len(self._sources))
             plot = bp.figure(
                 title=title, plot_width=self._width, plot_height=self._height)
             plot.xaxis.axis_label = 'millis'
             plot.yaxis.visible = False
             for name, sources in self._sources.items():
-                color = next(colors)
+                color = next(_colors)
                 plot.quad(
                     top='top', bottom=0, left='left', right='right',
                     source=sources['hist'],
@@ -116,8 +114,9 @@ class Display(object):
 
     def update(self, samples):
         with Timer() as timer:
+            timings = analyze.timings(samples)
             for name, sources in self._sources.items():
-                array = samples[name].values
+                array = timings[name].values
                 hist, edges = np.histogram(array, density=True, bins='auto')
                 x, y = sns.distributions._statsmodels_univariate_kde(
                     array, 'gau', 'scott', 200, 3, (-np.inf, np.inf),
@@ -144,10 +143,10 @@ class Display(object):
                     'y': [whisker_height]
                 }
 
-            self._describe_widget.data = samples.describe().to_html()
-            total_bench_time = samples[self._initial_size:].sum().sum() / 1000.
+            self._describe_widget.data = timings.describe().to_html()
+            total_bench_time = timings[self._initial_size:].sum().sum() / 1000.
             elapsed = time.perf_counter() - self._start
-            num_samples = len(samples.index)
+            num_samples = len(timings.index)
             title = (
                 '{} samples, {:.2f} sec elapsed, {:.2f} samples/sec, '
                 '{:.2f}% efficiency').format(
@@ -169,6 +168,10 @@ class Display(object):
         self._elapsed_rendering_seconds += timer.elapsed_seconds()
 
 
+def _flatten(l):
+    return [n for sublist in l for n in sublist]
+
+
 def bench(*fns, samples=None, efficiency=.9):
     '''Benchmarks functions, displaying results in a Jupyter notebook.
 
@@ -180,15 +183,25 @@ def bench(*fns, samples=None, efficiency=.9):
         sample_records = [tuple(r) for r in samples.to_records(index=False)]
     names = [fn.__name__ for fn in fns]
     disp = Display(names, len(sample_records))
+    index = pd.MultiIndex(
+        levels=[names, ('begin', 'end')],
+        labels=[_flatten([(i, i) for i in range(len(names))]),
+                [0, 1] * len(names)],
+        names=('function', 'timing'))
     try:
         while True:
-            sample_records.append(tuple(Timer.time(fn) * 1000. for fn in fns))
+            sample = []
+            for fn in fns:
+                with Timer() as timer:
+                    fn()
+                sample.extend((timer.begin, timer.end))
+            sample_records.append(tuple(t * 1000 for t in sample))
 
             if (len(sample_records) > 10
                     and disp.elapsed_rendering_ratio() < (1. - efficiency)):
                 samples = pd.DataFrame.from_records(
-                    iter(sample_records), columns=names)
+                    iter(sample_records), columns=index)
                 disp.update(samples)
     except KeyboardInterrupt:
         return pd.DataFrame.from_records(
-            iter(sample_records), columns=names)
+            iter(sample_records), columns=index)
