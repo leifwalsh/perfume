@@ -7,6 +7,7 @@ import time
 
 from bokeh import io as bi
 from bokeh import models as bm
+import bokeh.palettes
 from bokeh import plotting as bp
 from IPython import display as ipdisplay
 import numpy as np
@@ -111,6 +112,16 @@ class Display(object):
         self._elapsed_rendering_seconds -= timer.elapsed_seconds()
         return plot
 
+    @staticmethod
+    def _ks_style(s):
+        if np.isnan(s):
+            return ''
+        else:
+            thresholds = [1.22, 1.36, 1.48, 1.63, 1.73, 1.95]
+            cs = list(reversed(bokeh.palettes.RdYlGn[len(thresholds) + 1]))
+            color = cs[np.searchsorted(thresholds, s)]
+            return 'background-color: {}'.format(color)
+
     def update(self, samples):
         with Timer() as timer:
             timings = analyze.timings(samples)
@@ -142,7 +153,11 @@ class Display(object):
                     'y': [whisker_height]
                 }
 
-            self._describe_widget.data = timings.describe().to_html()
+            ks_frame = analyze.ks_test(samples)
+            html = (timings.describe().to_html()
+                    + ks_frame.style.applymap(self._ks_style).render())
+            self._describe_widget.data = html.replace(
+                'table','table style="display:inline"')
             total_bench_time = timings[self._initial_size:].sum().sum() / 1000.
             elapsed = time.perf_counter() - self._start
             num_samples = len(timings.index)

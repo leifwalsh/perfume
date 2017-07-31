@@ -9,7 +9,7 @@ Contents:
    readme
    installation
    usage
-   modules
+   analyze
    contributing
    authors
    history

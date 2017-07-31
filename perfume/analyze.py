@@ -5,7 +5,9 @@
 import bokeh.io as bi
 import bokeh.models as bm
 import bokeh.plotting as bp
+import numpy as np
 import pandas as pd
+from scipy import stats
 
 from perfume import colors
 
@@ -58,6 +60,48 @@ def timings_in_context(samples):
     t = iso.groupby(axis=1, level=0).apply(_timing_in_context)
     t.columns = t.columns.droplevel(0)
     return t
+
+
+def _ks_Z(a, b):
+    result = stats.ks_2samp(a, b)
+    n = len(a)
+    m = len(b)
+    return result.statistic / np.sqrt((n + m) / (n * m))
+
+
+def ks_test(samples):
+    '''Runs the Kolmogorov-Smirnov test across functions.
+
+    Returns a DataFrame containing all pairwise K-S test results.
+
+    The standard K-S test computes :math:`D`, which is the maximum
+    difference between the empirical CDFs.
+
+    The result value we return is the :math:`Z` value, defined as
+
+    .. math::
+
+       Z = D / \\sqrt{(n + m) / nm}
+
+    where :math:`n` and :math:`m` are the respective sample sizes.
+
+    :math:`Z` is typically interpreted using a lookup table, i.e. for
+    confidence level :math:`\\alpha`, we want to see a :math:`Z`
+    greater than :math:`c(\\alpha)`:
+
+    +--------------------+------+------+-------+------+-------+-------+
+    | :math:`\\alpha`     | 0.10 | 0.05 | 0.025 | 0.01 | 0.005 | 0.001 |
+    +--------------------+------+------+-------+------+-------+-------+
+    | :math:`c(\\alpha)`  | 1.22 | 1.36 | 1.48  | 1.63 | 1.73  | 1.95  |
+    +--------------------+------+------+-------+------+-------+-------+
+    '''
+    t = timings(samples)
+    data = {name: ([_ks_Z(t[name].values, t[t.columns[j]].values)
+                    for j in range(i + 1)]
+                   + ([np.nan] * (len(t.columns) - 2 - i)))
+            for i, name in enumerate(t.columns[1:])}
+    idx = pd.Index(t.columns[:-1], name='K-S test Z')
+    return pd.DataFrame(data, index=idx)
 
 
 def _cumulative_quantiles(group, rng):
