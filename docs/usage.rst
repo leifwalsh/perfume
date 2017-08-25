@@ -25,7 +25,7 @@ will display, and update:
 * Two pairwise Kolmogorov-Smirnov test tables, one on the raw samples,
   the other more sensitive to outliers (more on how later).
 
-.. image:: https://raw.githubusercontent.com/leifwalsh/perfume/master/docs/perfume.gif
+.. image:: perfume.gif
 
 Analyzing results
 -----------------
@@ -60,6 +60,6 @@ here:
   :func:`perfume.analyze.isolate`), so faster functions cover less of
   the x-axis.  For example:
 
-  .. image:: https://raw.githubusercontent.com/leifwalsh/perfume/master/docs/cumulative_quantiles.png
+  .. image:: cumulative_quantiles.png
 
 See :mod:`perfume.analyze` for the full set of analysis tools.
