@@ -188,14 +188,14 @@ class Display(object):
 
             if self._plot is None:
                 self._plot = self.initialize_plot(title)
+                bi.show(self._plot, notebook_handle=True)
                 ipdisplay.display(
                     self._describe_widget, display_id='describe')
-                bi.show(self._plot, notebook_handle=True)
             else:
                 self._plot.title.text = title
+                bi.push_notebook()
                 ipdisplay.update_display(
                     self._describe_widget, display_id='describe')
-                bi.push_notebook()
         self._elapsed_rendering_seconds += timer.elapsed_seconds()
 
 
