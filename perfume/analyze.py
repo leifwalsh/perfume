@@ -62,6 +62,15 @@ def timings_in_context(samples):
     return t
 
 
+def bucket_resample_timings(samples, sample_size=10, agg=np.mean, sample_count=1000):
+    def _meat_axe(s):
+        return pd.Series([
+            agg(np.random.choice(s.values, size=sample_size, replace=True))
+            for _ in range(sample_count)
+        ])
+    return timings(samples).apply(_meat_axe)
+
+
 def _ks_Z(a, b):
     result = stats.ks_2samp(a, b)
     n = len(a)
@@ -69,7 +78,7 @@ def _ks_Z(a, b):
     return result.statistic / np.sqrt((n + m) / (n * m))
 
 
-def ks_test(samples):
+def ks_test(t):
     '''Runs the Kolmogorov-Smirnov test across functions.
 
     Returns a DataFrame containing all pairwise K-S test results.
@@ -95,7 +104,6 @@ def ks_test(samples):
     | :math:`c(\\alpha)`  | 1.22 | 1.36 | 1.48  | 1.63 | 1.73  | 1.95  |
     +--------------------+------+------+-------+------+-------+-------+
     '''
-    t = timings(samples)
     data = {name: ([_ks_Z(t[name].values, t[t.columns[j]].values)
                     for j in range(i + 1)]
                    + ([np.nan] * (len(t.columns) - 2 - i)))
