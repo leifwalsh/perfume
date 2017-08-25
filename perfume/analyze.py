@@ -62,7 +62,8 @@ def timings_in_context(samples):
     return t
 
 
-def bucket_resample_timings(samples, sample_size=10, agg=np.mean, sample_count=1000):
+def bucket_resample_timings(samples, sample_size=10, agg=np.mean,
+                            sample_count=1000):
     def _meat_axe(s):
         return pd.Series([
             agg(np.random.choice(s.values, size=sample_size, replace=True))
