@@ -46,7 +46,7 @@ class Timer(object):
 class Display(object):
     def __init__(self, names, initial_size, width=900, height=480):
         # Call this once to raise an error early if necessary:
-        colors.colors(len(names))
+        self._colors = colors.colors(len(names))
 
         self._start = time.perf_counter()
         self._initial_size = initial_size
@@ -75,11 +75,11 @@ class Display(object):
 
     def initialize_plot(self, title):
         with Timer() as timer:
-            _colors = colors.colors(len(self._sources))
             plot = bp.figure(
                 title=title, plot_width=self._width, plot_height=self._height)
             plot.xaxis.axis_label = 'millis'
             plot.yaxis.visible = False
+            _colors = iter(self._colors)
             for name, sources in self._sources.items():
                 color = next(_colors)
                 plot.quad(
