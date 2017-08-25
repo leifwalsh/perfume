@@ -114,7 +114,7 @@ class Display(object):
     @staticmethod
     def _ks_style(s):
         if np.isnan(s):
-            return ''
+            return 'visibility: hidden'
         else:
             thresholds = [1.22, 1.36, 1.48, 1.63, 1.73, 1.95]
             cs = list(reversed(bokeh.palettes.RdYlGn[len(thresholds) + 1]))
@@ -128,6 +128,7 @@ class Display(object):
         import seaborn as sns
         with Timer() as timer:
             timings = analyze.timings(samples)
+            bucketed_timings = analyze.bucket_resample_timings(samples)
             for name, sources in self._sources.items():
                 array = timings[name].values
                 hist, edges = np.histogram(array, density=True, bins='auto')
@@ -156,11 +157,24 @@ class Display(object):
                     'y': [whisker_height]
                 }
 
-            ks_frame = analyze.ks_test(samples)
-            html = (timings.describe().to_html()
-                    + ks_frame.style.applymap(self._ks_style).render())
+            ks_frame = analyze.ks_test(timings)
+            ks_bk_frame = analyze.ks_test(bucketed_timings)
+            describe_html = (timings.describe().style
+                             .set_precision(3)
+                             .set_caption('Descriptive Timing Statistics')
+                             .render())
+            ks_html = (ks_frame.style.applymap(self._ks_style)
+                       .set_precision(3)
+                       .set_caption('K-S test')
+                       .render())
+            ks_bk_html = (ks_bk_frame.style.applymap(self._ks_style)
+                          .set_precision(2)
+                          .set_caption('Bucketed K-S test')
+                          .render())
+            html = describe_html + ks_html + ks_bk_html
             self._describe_widget.data = html.replace(
                 'table','table style="display:inline"')
+
             total_bench_time = timings[self._initial_size:].sum().sum() / 1000.
             elapsed = time.perf_counter() - self._start
             num_samples = len(timings.index)
