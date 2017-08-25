@@ -8,11 +8,16 @@ Installation
 Stable release
 --------------
 
+.. todo::
+
+   This ``perfume`` is not on PyPI yet, there's another ``perfume``
+   there.  Still working on deciding the right thing to do about that.
+
 To install perfume, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install perfume
+    $ pip install https://github.com/leifwalsh/perfume
 
 This is the preferred method to install perfume, as it will always install the most recent stable release. 
 
@@ -32,7 +37,7 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/leifwalsh/perfume
+    $ git clone https://github.com/leifwalsh/perfume
 
 Or download the `tarball`_:
 
