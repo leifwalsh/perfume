@@ -173,7 +173,7 @@ class Display(object):
                           .render())
             html = describe_html + ks_html + ks_bk_html
             self._describe_widget.data = html.replace(
-                'table','table style="display:inline"')
+                'table', 'table style="display:inline"')
 
             total_bench_time = timings[self._initial_size:].sum().sum() / 1000.
             elapsed = time.perf_counter() - self._start
