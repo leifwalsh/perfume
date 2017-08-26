@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
-'''Analysis tools.'''
+''':mod:`perfume.analyze` contains transformation and analysis tools.
+
+These functions mostly take as input the samples collected by
+:func:`perfume.bench`.
+'''
 
 import bokeh.io as bi
 import bokeh.models as bm
