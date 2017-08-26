@@ -206,7 +206,30 @@ def _flatten(l):
 def bench(*fns, samples=None, efficiency=.9):
     '''Benchmarks functions, displaying results in a Jupyter notebook.
 
-    TODO: more
+    Runs ``fns`` repeatedly, collecting timing information, until
+    :exception:`KeyboardInterrupt` is raised, at which point
+    benchmarking stops and the results so far are returned.
+
+    Parameters
+    ----------
+    fns : list of callable
+        A list of functions to benchmark and compare
+    samples : pandas.DataFrame
+        Optionally, pass the results of a previous call to
+        :func:`bench` to continue from its already collected data.
+    efficiency : float
+        Number between 0 and 1.  Represents the target portion of time
+        we aim to spend running the functions under test (so, we spend
+        up to :math:`1 - efficiency` time analyzing and rendering
+        plots).
+
+    Returns
+    -------
+    pandas.DataFrame
+        A dataframe containing the results so far.  The row index is
+        just an autoincrement integer, and the column index is a
+        :class:`pandas.MultiIndex` where the first level is function
+        name and the second level is ``begin`` or ``end``.
     '''
     if samples is None:
         sample_records = []

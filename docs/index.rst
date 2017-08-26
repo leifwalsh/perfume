@@ -1,5 +1,5 @@
-Welcome to perfume's documentation!
-======================================
+perfume: Interactive performance benchmarking in Jupyter
+========================================================
 
 Contents:
 
@@ -9,7 +9,7 @@ Contents:
    readme
    installation
    usage
-   analyze
+   api
    contributing
    authors
    history
