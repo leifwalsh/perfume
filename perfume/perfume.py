@@ -12,7 +12,6 @@ from bokeh import plotting as bp
 from IPython import display as ipdisplay
 import numpy as np
 import pandas as pd
-import seaborn as sns
 
 from perfume import analyze
 from perfume import colors
@@ -123,6 +122,10 @@ class Display(object):
             return 'background-color: {}'.format(color)
 
     def update(self, samples):
+        # If this is a module-level import, readthedocs fails because
+        # this triggers an import of _tkinter, which isn't built in to
+        # the python that they use.
+        import seaborn as sns
         with Timer() as timer:
             timings = analyze.timings(samples)
             for name, sources in self._sources.items():
