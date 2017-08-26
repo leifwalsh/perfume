@@ -9,3 +9,12 @@ Sphinx==1.4.8
 cryptography==1.7
 PyYAML==3.11
 
+Click>=6.0
+bokeh>=0.12
+ipython>=5.0
+ipywidgets>=5.0
+notebook>=5.0
+numpy>=1.11
+pandas>=0.19
+seaborn>=0.7
+statsmodels>=0.8
