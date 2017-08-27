@@ -9,7 +9,7 @@ Sphinx>=1.6,<1.7
 sphinx-rtd-theme>=0.2,<0.3
 nbsphinx>=0.2,<0.3
 cryptography==2.0.3
-PyYAML==3.11
+PyYAML==3.12
 
 Click>=6.0,<7.0
 bokeh>=0.12,<0.13
