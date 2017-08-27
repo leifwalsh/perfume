@@ -20,6 +20,7 @@ deploy:
   true:
     repo: leifwalsh/perfume
     tags: true
+    python: 3.6
 install: pip install -U tox-travis
 language: python
 python:
