@@ -14,7 +14,7 @@ PyYAML==3.12
 Click>=6.0,<7.0
 bokeh>=0.12,<0.13
 ipython>=5.0,<7.0
-ipywidgets>=5.0,<7.0
+ipywidgets==7.0.0
 notebook>=5.0,<7.0
 numpy>=1.11,<1.14
 pandas>=0.19,<1.0
