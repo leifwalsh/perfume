@@ -9,6 +9,7 @@ Contents:
    readme
    installation
    usage
+   example.ipynb
    api
    contributing
    authors
