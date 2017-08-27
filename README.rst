@@ -27,9 +27,8 @@ Interactive performance benchmarking in Jupyter
 Demo
 ----
 
-You can check out `an example notebook
-<http://nbviewer.jupyter.org/github/leifwalsh/perfume/blob/master/examples/perfume.ipynb>`__
-using perfume.
+You can check out `an example notebook <docs/example.ipynb>`__ using
+perfume.
 
 .. image:: docs/perfume.gif
 
