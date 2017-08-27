@@ -17,7 +17,7 @@ To install perfume, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install https://github.com/leifwalsh/perfume
+    $ pip install perfume-bench
 
 This is the preferred method to install perfume, as it will always install the most recent stable release. 
 

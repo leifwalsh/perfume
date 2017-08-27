@@ -3,8 +3,8 @@ perfume
 =======
 
 
-.. image:: https://img.shields.io/pypi/v/perfume.svg
-        :target: https://pypi.python.org/pypi/perfume
+.. image:: https://img.shields.io/pypi/v/perfume-bench.svg
+        :target: https://pypi.python.org/pypi/perfume-bench
 
 .. image:: https://img.shields.io/travis/leifwalsh/perfume.svg
         :target: https://travis-ci.org/leifwalsh/perfume
@@ -14,8 +14,8 @@ perfume
         :alt: Documentation Status
 
 .. image:: https://pyup.io/repos/github/leifwalsh/perfume/shield.svg
-     :target: https://pyup.io/repos/github/leifwalsh/perfume/
-     :alt: Updates
+        :target: https://pyup.io/repos/github/leifwalsh/perfume/
+        :alt: Updates
 
 
 Interactive performance benchmarking in Jupyter
@@ -23,16 +23,6 @@ Interactive performance benchmarking in Jupyter
 
 * Free software: BSD license
 * Documentation: https://perfume.readthedocs.io.
-
-Demo
-----
-
-You can check out `an example notebook <docs/example.ipynb>`__ using
-perfume.
-
-.. image:: docs/perfume.gif
-
-.. image:: docs/cumulative_quantiles.png
 
 Overview
 --------
@@ -58,8 +48,25 @@ Features
 * Comparative analysis of multiple functions under test.
 * Powerful post-processing analysis tools.
 
+Demo
+----
+
+You can check out `an example notebook <docs/example.ipynb>`__ using
+perfume.
+
+.. image:: docs/perfume.gif
+
+.. image:: docs/cumulative_quantiles.png
+
+Installing
+----------
+
+.. code-block:: none
+
+    pip install perfume-bench
+
 Credits
----------
+-------
 
 This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
 
