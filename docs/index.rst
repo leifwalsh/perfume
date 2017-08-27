@@ -10,7 +10,7 @@ Contents:
    installation
    usage
    example.ipynb
-   api
+   modules
    contributing
    authors
    history
