@@ -16,6 +16,7 @@ requirements = [
     'bokeh>=0.12',
     'ipython>=5.0',
     'ipywidgets>=5.0',
+    'matplotlib>=2.0',
     'notebook>=5.0',
     'numpy>=1.11',
     'pandas>=0.19',
