@@ -1,5 +1,5 @@
 pip>=9.0,<10.0
-versioneer
+versioneer==0.18
 wheel==0.29.0
 watchdog==0.8.3
 flake8>=3.4,<4.0
