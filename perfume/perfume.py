@@ -161,7 +161,7 @@ class Display(object):
                              .set_precision(3)
                              .set_caption('Descriptive Timing Statistics')
                              .render())
-            if len(self._colors) > 1:
+            if len(self._sources) > 1:
                 ks_frame = analyze.ks_test(timings)
                 ks_bk_frame = analyze.ks_test(bucketed_timings)
                 ks_html = (ks_frame.style.applymap(self._ks_style)

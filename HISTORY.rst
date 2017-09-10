@@ -2,6 +2,11 @@
 History
 =======
 
+0.1.3 (2017-09-10)
+------------------
+
+* Actually fix when only benchmarking one function (no K-S test) (oops).
+
 0.1.2 (2017-09-10)
 ------------------
 
