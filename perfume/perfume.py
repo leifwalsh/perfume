@@ -157,23 +157,26 @@ class Display(object):
                     'y': [whisker_height]
                 }
 
-            ks_frame = analyze.ks_test(timings)
-            ks_bk_frame = analyze.ks_test(bucketed_timings)
             describe_html = (timings.describe().style
                              .set_precision(3)
                              .set_caption('Descriptive Timing Statistics')
                              .render())
-            ks_html = (ks_frame.style.applymap(self._ks_style)
-                       .set_precision(3)
-                       .set_caption('K-S test')
-                       .render())
-            ks_bk_html = (ks_bk_frame.style.applymap(self._ks_style)
-                          .set_precision(2)
-                          .set_caption('Bucketed K-S test')
-                          .render())
-            html = describe_html + ks_html + ks_bk_html
-            self._describe_widget.data = html.replace(
-                'table', 'table style="display:inline"')
+            if len(self._colors) > 1:
+                ks_frame = analyze.ks_test(timings)
+                ks_bk_frame = analyze.ks_test(bucketed_timings)
+                ks_html = (ks_frame.style.applymap(self._ks_style)
+                           .set_precision(3)
+                           .set_caption('K-S test')
+                           .render())
+                ks_bk_html = (ks_bk_frame.style.applymap(self._ks_style)
+                              .set_precision(2)
+                              .set_caption('Bucketed K-S test')
+                              .render())
+                html = describe_html + ks_html + ks_bk_html
+                self._describe_widget.data = html.replace(
+                    'table', 'table style="display:inline"')
+            else:
+                self._describe_widget.data = describe_html
 
             total_bench_time = timings[self._initial_size:].sum().sum() / 1000.
             elapsed = time.perf_counter() - self._start
