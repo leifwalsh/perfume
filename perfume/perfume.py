@@ -4,6 +4,7 @@
 
 import collections
 import time
+import uuid
 
 from bokeh import io as bi
 from bokeh import models as bm
@@ -75,6 +76,7 @@ class Display(object):
         self._plot = None
         self._elapsed_rendering_seconds = 0.0
         self._describe_widget = ipdisplay.HTML("")
+        self._display_id = str(uuid.uuid1())
 
     def elapsed_rendering_ratio(self):
         elapsed = time.perf_counter() - self._start
@@ -234,12 +236,14 @@ class Display(object):
             if self._plot is None:
                 self._plot = self.initialize_plot(title)
                 bi.show(self._plot, notebook_handle=True)
-                ipdisplay.display(self._describe_widget, display_id="describe")
+                ipdisplay.display(
+                    self._describe_widget, display_id=self._display_id
+                )
             else:
                 self._plot.title.text = title
                 bi.push_notebook()
                 ipdisplay.update_display(
-                    self._describe_widget, display_id="describe"
+                    self._describe_widget, display_id=self._display_id
                 )
         self._elapsed_rendering_seconds += timer.elapsed_seconds()
 
