@@ -6,7 +6,7 @@ flake8>=3.4,<4.0
 tox==3.0.0
 coverage==4.5.1
 Sphinx==1.7.5
-sphinx-rtd-theme==0.3.1
+sphinx-rtd-theme==0.4.0
 nbsphinx==0.3.3
 cryptography==2.2.2
 PyYAML==3.12
@@ -16,7 +16,7 @@ ipython>=5.0,<7.0
 ipywidgets==7.2.1
 matplotlib>=2.0,<3.0
 notebook>=5.0,<7.0
-numpy==1.14.3
+numpy==1.14.5
 pandas>=0.19,<1.0
 seaborn>=0.7,<0.9
 statsmodels==0.9.0
