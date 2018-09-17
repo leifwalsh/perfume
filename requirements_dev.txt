@@ -7,7 +7,7 @@ tox==3.2.1
 coverage==4.5.1
 Sphinx==1.8.0
 sphinx-rtd-theme==0.4.1
-nbsphinx==0.3.3
+nbsphinx==0.3.5
 cryptography==2.3.1
 PyYAML==3.13
 
