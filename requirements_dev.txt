@@ -16,7 +16,7 @@ ipython==7.1.1
 ipywidgets==7.4.2
 matplotlib==3.0.2
 notebook>=5.0,<7.0
-numpy==1.15.3
+numpy==1.15.4
 pandas>=0.19,<1.0
 seaborn==0.9.0
 statsmodels==0.9.0
