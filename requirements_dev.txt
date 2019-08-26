@@ -1,4 +1,4 @@
-pip==19.2.2
+pip==19.2.3
 versioneer==0.18
 wheel==0.33.6
 watchdog==0.9.0
