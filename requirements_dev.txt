@@ -9,7 +9,7 @@ Sphinx==2.4.4
 sphinx-rtd-theme==0.4.3
 nbsphinx==0.5.1
 cryptography==2.8
-PyYAML==5.1.2
+PyYAML==5.3
 
 bokeh==1.4.0
 ipython==7.9.0
