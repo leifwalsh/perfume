@@ -18,5 +18,5 @@ matplotlib==3.2.0
 notebook>=5.0,<7.0
 numpy==1.18.1
 pandas==1.0.1
-seaborn==0.9.0
+seaborn==0.10.0
 statsmodels==0.10.1
