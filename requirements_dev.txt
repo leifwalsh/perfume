@@ -12,7 +12,7 @@ cryptography==2.8
 PyYAML==5.3.1
 
 bokeh==2.0.1
-ipython==7.9.0
+ipython==7.13.0
 ipywidgets==7.5.1
 matplotlib==3.1.1
 notebook>=5.0,<7.0
