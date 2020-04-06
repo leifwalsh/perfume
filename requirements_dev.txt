@@ -11,7 +11,7 @@ nbsphinx==0.6.0
 cryptography==2.9
 PyYAML==5.3.1
 
-bokeh==1.4.0
+bokeh==2.0.1
 ipython==7.9.0
 ipywidgets==7.5.1
 matplotlib==3.1.1
