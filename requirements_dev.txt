@@ -5,7 +5,7 @@ watchdog==0.10.3
 flake8>=3.4,<4.0
 tox==3.16.0
 coverage==5.1
-Sphinx==2.2.1
+Sphinx==3.1.1
 sphinx-rtd-theme==0.4.3
 nbsphinx==0.4.3
 cryptography==2.8
