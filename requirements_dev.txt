@@ -3,7 +3,7 @@ versioneer==0.18
 wheel==0.35.1
 watchdog==0.10.3
 flake8>=3.4,<4.0
-tox==3.14.0
+tox==3.19.0
 coverage==4.5.4
 Sphinx==2.2.1
 sphinx-rtd-theme==0.4.3
