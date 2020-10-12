@@ -4,7 +4,7 @@ wheel==0.35.1
 watchdog==0.10.3
 flake8>=3.4,<4.0
 tox==3.20.1
-coverage==4.5.4
+coverage==5.3
 Sphinx==2.2.1
 sphinx-rtd-theme==0.4.3
 nbsphinx==0.4.3
