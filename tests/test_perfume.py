@@ -40,7 +40,7 @@ class TestAnalyze(unittest.TestCase):
             data=samples,
             columns=pd.MultiIndex(
                 levels=[["fn1", "fn2"], ["begin", "end"]],
-                labels=[[0, 0, 1, 1], [0, 1, 0, 1]],
+                codes=[[0, 0, 1, 1], [0, 1, 0, 1]],
             ),
         )
 
@@ -88,7 +88,7 @@ class TestAnalyze(unittest.TestCase):
         # gives us.
         fn1_expected = pd.Series(
             1.1,
-            index=pd.TimedeltaIndex(
+            index=pd.timedelta_range(
                 freq=pd.Timedelta("1.1s"),
                 start="1.1s",
                 periods=20,
@@ -97,7 +97,7 @@ class TestAnalyze(unittest.TestCase):
         )
         fn2_expected = pd.Series(
             1.5,
-            index=pd.TimedeltaIndex(
+            index=pd.timedelta_range(
                 freq=pd.Timedelta("1.5s"),
                 start="1.5s",
                 periods=20,
